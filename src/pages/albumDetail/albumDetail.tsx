@@ -7,6 +7,7 @@ import { getAlbumDetail } from '../../services/index'
 import CommonBar from '../../components/commonBar/index'
 import PlayDetail from '../playDetail/playDetail'
 import { fetchSongById } from '../../actions'
+import { getCacheData } from '../../utils/index'
 import Loading from '../../components/loading'
 
 import '../listDetail/listDetail.scss'
@@ -19,7 +20,8 @@ interface AlbumDetailStates {
   album: any,
   songs: any,
   scrollState: boolean,
-  loading: boolean
+  loading: boolean,
+  paramid:number
 }
 
 const mapStateToProps = ({ main }) => ({
@@ -40,11 +42,13 @@ class AlbumDetail extends Component<AlbumDetailProps, AlbumDetailStates> {
       album: {},
       songs: [],
       scrollState: false,
-      loading: true
+      loading: true,
+      paramid:0,
     }
   }
 
   componentWillPreload(params) {
+    this.setState({paramid:params.id})
     return getAlbumDetail({
       id: params.id
     })
@@ -55,15 +59,32 @@ class AlbumDetail extends Component<AlbumDetailProps, AlbumDetailStates> {
   }
 
   getListDetail() {
-    this.$preloadData.then(res => {
-      if (res.code === 200) {
-        this.setState({
-          songs: res.songs,
-          album: res.album,
-          loading: false
-        })
-      }
-    })
+    if(process.env.TARO_ENV === 'h5'){
+      let paramid = getCacheData('albumDetailId')
+      getAlbumDetail({
+        id: paramid
+      }).then(res => {
+        if (res.code === 200) {
+          this.setState({
+            songs: res.songs,
+            album: res.album,
+            loading: false
+          })
+        }
+      })
+    }
+    else{
+      this.$preloadData.then(res => {
+        if (res.code === 200) {
+          this.setState({
+            songs: res.songs,
+            album: res.album,
+            loading: false
+          })
+        }
+      })
+    }
+    
   }
 
   playSongById(id, restore) {
@@ -121,7 +142,7 @@ class AlbumDetail extends Component<AlbumDetailProps, AlbumDetailStates> {
         <ScrollView
           className='wrap'
           scrollY
-          scrollTop='0'
+          scrollTop={0}
           onScroll={this.scroll}
           style={{ height: `${winHeight}px` }}>
         <View className='listCoverBanner'>

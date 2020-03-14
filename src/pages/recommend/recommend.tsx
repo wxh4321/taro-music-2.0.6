@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, ScrollView, Text, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
-import { getCacheData } from '../../utils/index'
+import { getCacheData,setCacheData } from '../../utils/index'
 import { fetchRecommendList, updateState } from '../../actions'
 import Loading from '../../components/loading'
 
@@ -58,6 +58,9 @@ class Recommend extends Component<any, {}> {
   navigateTo(url: string) {
     Taro.navigateTo({url: url})
   }
+  redirectTo(url:string){
+    Taro.redirectTo({url:url})
+  }
   componentDidMount(){
     this.getRecommendList();
   }
@@ -68,10 +71,14 @@ class Recommend extends Component<any, {}> {
     }
     const RecommendList = recommendList.slice(1).map((data, k) => {
       return (
-        <View onClick={this.navigateTo.bind(this, `/pages/listDetail/listDetail?id=${data.id}`)} key={k}>
+        <View onClick={()=>{
+          setCacheData('listDetailId',data.id)
+          this.navigateTo.bind(this, `/pages/listDetail/listDetail?id=${data.id}`)()
+          }
+          } key={k}>
           <View className='album-itembox'>
             <View className='cover'>
-              <Image src={data.picUrl} lazyLoad></Image>
+              <Image src={data.picUrl} lazyLoad className='image1'></Image>
             </View>
             <View className='r'>
               <View className='desc'>{data.name}</View>
@@ -93,7 +100,7 @@ class Recommend extends Component<any, {}> {
                 <View className='list-tag'><View className='iconfont icon-iconset0271'></View>
                   <Text>{this.getPlayCount(recommendList[0].playCount)}</Text>
                 </View>
-                <Image src={recommendList[0].picUrl || ''} lazyLoad></Image>
+                <Image src={recommendList[0].picUrl || ''} lazyLoad className='image1'></Image>
               </View>
               <View className='info'>
                 <Text className='name'>{recommendList[0].name || ''}</Text>

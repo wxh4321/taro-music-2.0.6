@@ -2,6 +2,7 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, ScrollView, Text, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import { fetchAlbumList, updateState } from '../../actions'
+import { setCacheData } from '../../utils/index'
 import Loading from '../../components/loading'
 
 import './album.scss'
@@ -65,18 +66,22 @@ class Album extends Component<any, {}> {
       <View className='album'>
         <ScrollView
           scrollY
-          scrollTop='0'
-          lowerThreshold='150'
+          scrollTop={0}
+          lowerThreshold={150}
           enableBackToTop
           onScrollToLower={this.loadingMore}
           className='item-list'>
         {
             albumList.map((data, k) => {
               return (
-                <View onClick={this.navigateTo.bind(this, `/pages/albumDetail/albumDetail?id=${data.id}`)} key={k}>
+                <View onClick={()=>{
+                    setCacheData('albumDetailId',data.id)
+                    this.navigateTo.bind(this, `/pages/albumDetail/albumDetail?id=${data.id}`)()
+                  }
+                  } key={k}>
                   <View className='album-itembox clearfix'>
                     <View className='cover'>
-                      <Image src={data.picUrl} lazyLoad></Image>
+                      <Image src={data.picUrl} lazyLoad className='image1'></Image>
                     </View>
                     <View className='info'>
                       <View className='name'>{data.name}</View>

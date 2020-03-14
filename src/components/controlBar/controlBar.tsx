@@ -22,7 +22,7 @@ class ControlBar extends Component<ControlBarProps, {}> {
     return (
       <View className={`fix-control ${isUIPage ? '' : 'fix-control-active'}`}>
         <View className='cover' onClick={onToUIPage.bind(this)}>
-          <Image src={songInfo.al.picUrl || coverImg} style={playState ? transform : ''}></Image>
+          <Image src={songInfo.al.picUrl || coverImg} className='image1' style={playState ? transform : ''}></Image>
         </View>
         <View className='info' onClick={onToUIPage.bind(this)}>
           <View className='name'>{songInfo.name || ''}</View>

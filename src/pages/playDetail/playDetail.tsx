@@ -34,7 +34,7 @@ class PlayDetail extends Component<any, PlayDetailStates> {
   static options = {
     addGlobalClass: true
   }
-  private audio: Taro.BackgroundAudioManager = getGlobalData('backgroundAudioManager')
+  private audio: any = getGlobalData('backgroundAudioManager')
   constructor() {
     super(...arguments)
     this.state = {
@@ -45,9 +45,14 @@ class PlayDetail extends Component<any, PlayDetailStates> {
     }
   }
   componentDidMount() {
-    this.audio.onTimeUpdate(() => {
-      this.getAudioPlayPercent()
-    })
+    if(process.env.TARO_ENV !== 'weapp'){
+      this.audio = document.getElementById('audioPlay')
+    }
+    if(this.audio&&this.audio.onTimeUpdate){
+      this.audio.onTimeUpdate(() => {
+        this.getAudioPlayPercent()
+      })
+    }
   }
   componentWillReceiveProps(nextProps) {
     let { main } = nextProps
@@ -173,7 +178,7 @@ class PlayDetail extends Component<any, PlayDetailStates> {
           </View>
           {/* 封面 */}
           <View className='cover'>
-            <Image src={songInfo.al.picUrl || coverImg} style={main.playState ? transform : ''}></Image>
+            <Image src={songInfo.al.picUrl || coverImg} style={main.playState ? transform : ''} className='image1'></Image>
           </View>
           {/* 歌词 */}
           <View className='lyric-box'>

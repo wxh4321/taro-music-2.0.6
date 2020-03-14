@@ -118,7 +118,10 @@ export default modelExtend(model,  {
             cover: songData.al.picUrl,
             from: 'online',
           }
-          initBackgroundAudioInfo(songObj, callback)
+          if(process.env.TARO_ENV === 'weapp'){
+            initBackgroundAudioInfo(songObj, callback)
+          }
+          
           if (!playList.map(i => i.id).includes(id)) {
             playList.unshift(songObj)
             yield put(Action('updateState', {playList}))

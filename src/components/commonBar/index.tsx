@@ -46,7 +46,7 @@ class CommonBar extends Component<any, CommonBarStates> {
     addGlobalClass: true
   }
   private query?:any = null
-  private audio: Taro.BackgroundAudioManager = getGlobalData('backgroundAudioManager')
+  private audio: any = getGlobalData('backgroundAudioManager')
   constructor() {
     super(...arguments)
     this.state = {
@@ -106,6 +106,11 @@ class CommonBar extends Component<any, CommonBarStates> {
   //播放切换
   switchPlay(state: boolean) {
     let { onUpdateState } = this.props
+    if(process.env.TARO_ENV !== 'weapp'){
+      let currentSong = this.props.main.currentSong
+      this.audio.src = currentSong.url
+      this.audio.play()
+    }
     if (this.audio && this.audio.src && this.audio.src.indexOf('/null') == -1) {
       state ? this.audio.play() : this.audio.pause()
       onUpdateState('main', { playState: state })
@@ -286,23 +291,23 @@ class CommonBar extends Component<any, CommonBarStates> {
   initAudioManager() {
     if(this.audio){
       // 音乐停止
-      this.audio.onEnded(() => {
+      this.audio.onEnded&&this.audio.onEnded(() => {
         this.playNext(1)
       })
       // 用户在系统音乐播放面板点击上一曲事件（iOS only）
-      this.audio.onPrev(() => {
+      this.audio.onPrev&&this.audio.onPrev(() => {
         this.playNext(-1)
       })
       // 用户在系统音乐播放面板点击下一曲事件（iOS only）
-      this.audio.onNext(() => {
+      this.audio.onNext&&this.audio.onNext(() => {
         this.playNext(1)
       })
       // 背景音频播放事件
-      this.audio.onPlay(() => {
+      this.audio.onPlay&&this.audio.onPlay(() => {
         !this.props.main.playState && this.switchPlay(true)
       })
       // 背景音频暂停事件
-      this.audio.onPause(() => {
+      this.audio.onPause&&this.audio.onPause(() => {
         this.props.main.playState && this.switchPlay(false)
       })
     }
@@ -359,6 +364,9 @@ class CommonBar extends Component<any, CommonBarStates> {
     }
   }
   componentDidMount() {
+    if(process.env.TARO_ENV !== 'weapp'){
+      this.audio = document.getElementById('audioPlay')
+    }
     this.query = Taro.createSelectorQuery()
     this.initAudioManager()
     this.initEvents()
@@ -381,6 +389,9 @@ class CommonBar extends Component<any, CommonBarStates> {
     }
     return (
       <View className='common-bar-wrapper'>
+         {/*音乐播放器 */}
+         <audio id="audioPlay">
+         </audio>
          {/*播放列表*/}
          <PlayList playList={playList}
                   playListState={playListState}

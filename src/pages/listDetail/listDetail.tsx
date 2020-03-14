@@ -10,6 +10,7 @@ import { fetchSongById } from '../../actions'
 import Loading from '../../components/loading'
 
 import './listDetail.scss'
+import { getCacheData } from '../../utils/index'
 
 interface ListDetailProps {
   main: StoreState.MainState;
@@ -37,7 +38,7 @@ class ListDetail extends Component<ListDetailProps, ListDetailStates> {
     this.state = {
       listData: {},
       scrollState: false,
-      loading: true
+      loading: true,
     }
   }
   componentWillPreload(params) {
@@ -49,14 +50,29 @@ class ListDetail extends Component<ListDetailProps, ListDetailStates> {
     this.fetchListDetail()
   }
   fetchListDetail() {
-    this.$preloadData.then(res => {
-      if (res.code === 200) {
-        this.setState({
-          listData: res.playlist,
-          loading: false
-        })
-      }
-    })
+    if(process.env.TARO_ENV === 'h5'){
+      let paramid = getCacheData('listDetailId')
+      getPlayList({
+        id: paramid
+      }).then(res => {
+        if (res.code === 200) {
+          this.setState({
+            listData: res.playlist,
+            loading: false
+          })
+        }
+      })
+    }
+    else{
+      this.$preloadData.then(res => {
+        if (res.code === 200) {
+          this.setState({
+            listData: res.playlist,
+            loading: false
+          })
+        }
+      })
+    }
   }
   playSongById(id, restore) {
     this.props.onFetchSongById({ id, restore })
@@ -111,7 +127,7 @@ class ListDetail extends Component<ListDetailProps, ListDetailStates> {
         {/*  </View> */}
         <ScrollView
           scrollY
-          scrollTop='0'
+          scrollTop={0}
           onScroll={this.scroll}
           className='wrap'
           style={{ height: `${winHeight}px` }}>

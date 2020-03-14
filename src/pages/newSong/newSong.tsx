@@ -65,7 +65,7 @@ class NewSong extends Component<any, {}> {
               <View key={k} className={`song-itembox ${currentSong.id === data.id ? 'song-itembox-active' : ''}`}
                     onClick={this.playSongById.bind(this, data.id)}>
                 <View className='cover'>
-                  <Image src={data.song.album.picUrl} lazyLoad></Image>
+                  <Image src={data.song.album.picUrl} className='image1'></Image>
                 </View>
                 <View className='info'>
                   <View className='name'>{data.song.name}</View>
